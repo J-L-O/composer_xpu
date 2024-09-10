@@ -9,5 +9,6 @@ from composer.devices.device_gpu import DeviceGPU
 from composer.devices.device_hpu import DeviceHPU
 from composer.devices.device_mps import DeviceMPS
 from composer.devices.device_tpu import DeviceTPU
+from composer.devices.device_xpu import DeviceXPU
 
-__all__ = ['Device', 'DeviceCPU', 'DeviceGPU', 'DeviceMPS', 'DeviceTPU', 'DeviceHPU']
+__all__ = ['Device', 'DeviceCPU', 'DeviceGPU', 'DeviceXPU', 'DeviceMPS', 'DeviceTPU', 'DeviceHPU']

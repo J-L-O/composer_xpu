@@ -25,7 +25,7 @@ def get_device(device: Optional[Union[str, 'Device']]) -> 'Device':
             Device. If no argument is passed, returns :class:`.DeviceGPU` if available,
             or :class:`.DeviceCPU` if no GPU is available.
     """
-    from composer.devices import DeviceCPU, DeviceGPU, DeviceHPU, DeviceMPS, DeviceTPU
+    from composer.devices import DeviceCPU, DeviceGPU, DeviceHPU, DeviceMPS, DeviceTPU, DeviceXPU
 
     if not device:
         device = DeviceGPU() if torch.cuda.is_available() else DeviceCPU()
@@ -46,10 +46,26 @@ def get_device(device: Optional[Union[str, 'Device']]) -> 'Device':
             if not is_hpu_installed():
                 raise ImportError('Unable to import habana-torch-plugin.')
             device = DeviceHPU()
+        elif device.lower() == 'xpu':
+            if not is_xpu_installed():
+                raise ImportError('Unable to import intel_extension_for_pytorch')
+            device = DeviceXPU()
         else:
-            raise ValueError(f'device ({device}) must be one of (cpu, gpu, mps, tpu, hpu).')
+            raise ValueError(f'device ({device}) must be one of (cpu, gpu, mps, tpu, hpu, xpu).')
     return device
 
+def is_xpu_installed() -> bool:
+    """Determines whether the module needed for training on XPUs—intel_extension_for_pytorch—is installed.
+
+    Returns:
+        bool: Whether intel_extension_for_pytorch is installed.
+    """
+    try:
+        import intel_extension_for_pytorch
+        del intel_extension_for_pytorch
+        return True
+    except ModuleNotFoundError:
+        return False
 
 def is_tpu_installed() -> bool:
     """Determines whether the module needed for training on TPUs—torch_xla—is installed.
