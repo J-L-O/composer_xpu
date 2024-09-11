@@ -37,6 +37,7 @@ class DeviceXPU(Device):
         allow_tf32: bool = True,
     ):
         import intel_extension_for_pytorch as ipex
+        import oneccl_bindings_for_pytorch
         if not torch.xpu.is_available():
             raise ValueError('DeviceXPU cannot be created as torch.xpu is not available.')
         if device_id is None:
