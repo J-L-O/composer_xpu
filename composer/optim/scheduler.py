@@ -676,6 +676,7 @@ class LinearWithWarmupScheduler(ComposerScheduler):
         t_warmup (str | Time): Warmup time.
         alpha_i (float): Initial learning rate multiplier. Default = ``1.0``.
         alpha_f (float): Final learning rate multiplier. Default = ``0.0``.
+        warmup_i (float): Initial learning rate multiplier for the warmup period. Default = ``0.0``.
         t_max (str | Time): The duration of this scheduler. Default = ``"1dur"``.
         scale_warmup (float): SSR also scales the warmup period. Default = ``False``.
     """
@@ -684,6 +685,7 @@ class LinearWithWarmupScheduler(ComposerScheduler):
                  t_warmup: Union[str, Time],
                  alpha_i: float = 1.0,
                  alpha_f: float = 0.0,
+                 warmup_i: float = 0.0,
                  t_max: Union[str, Time] = '1dur',
                  scale_warmup: bool = False):
         self.t_warmup = t_warmup
@@ -691,7 +693,7 @@ class LinearWithWarmupScheduler(ComposerScheduler):
         self.alpha_f = alpha_f
         self.t_max = t_max
         self.scale_warmup = scale_warmup
-        self.warmup_scheduler = LinearScheduler(alpha_i=0.0, alpha_f=alpha_i, t_max=t_warmup)
+        self.warmup_scheduler = LinearScheduler(alpha_i=warmup_i, alpha_f=alpha_i, t_max=t_warmup)
 
     def __call__(self, state: State, ssr: float = 1.0):
         assert state.max_duration is not None, 'max_duration should be set whenever schedulers are invoked'
