@@ -11,6 +11,7 @@ from typing import Any, Dict, Generator, Optional, Union
 import torch
 
 from composer.utils import StringEnum
+from composer.utils import is_xpu_installed
 
 try:
     import transformer_engine.pytorch as te
@@ -52,16 +53,26 @@ def get_precision_context(precision: Union[str, Precision],
         if torch.cuda.is_available():
             with torch.cuda.amp.autocast(False):
                 yield
+        elif is_xpu_installed() and torch.xpu.is_available():
+            with torch.xpu.amp.autocast(False):
+                yield
         else:
             # Yield here to avoid warnings about cuda not being available
             yield
     elif precision == Precision.AMP_FP16:
         # Retain compatibility with PyTorch < 1.10
-        with torch.cuda.amp.autocast(True):
-            yield
+        if torch.cuda.is_available():
+            with torch.cuda.amp.autocast(True):
+                yield
+        elif is_xpu_installed() and torch.xpu.is_available():
+            with torch.xpu.amp.autocast(True):
+                yield
     elif precision == Precision.AMP_BF16:
         if torch.cuda.is_available():
             with torch.cuda.amp.autocast(enabled=True, dtype=torch.bfloat16):
+                yield
+        elif is_xpu_installed() and torch.xpu.is_available():
+            with torch.xpu.amp.autocast(enabled=True, dtype=torch.bfloat16):
                 yield
         else:
             os.environ['XLA_USE_BF16'] = '1'
