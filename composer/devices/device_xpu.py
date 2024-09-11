@@ -8,7 +8,6 @@ from __future__ import annotations
 from typing import Any, Dict, Optional, TypeVar
 
 import torch
-import intel_extension_for_pytorch as ipex
 import torch.utils.data
 
 from composer.devices.device import Device
@@ -37,6 +36,7 @@ class DeviceXPU(Device):
         *,
         allow_tf32: bool = True,
     ):
+        import intel_extension_for_pytorch as ipex
         if not torch.xpu.is_available():
             raise ValueError('DeviceXPU cannot be created as torch.xpu is not available.')
         if device_id is None:
