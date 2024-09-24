@@ -801,6 +801,8 @@ class Trainer:
         ddp_sync_strategy (str | DDPSyncStrategy, optional): The strategy to use for synchronizing gradients.
             Leave unset to let the trainer auto-configure this. See :class:`.DDPSyncStrategy`
             for more details.
+        ddp_static_graph (bool, optional): Whether to set static_graph to True when initializing
+            DDP. (default: ``False``)
         profiler (Profiler, optional): The profiler, if profiling should be enabled. (default: ``None``)
 
             .. seealso::
@@ -912,6 +914,7 @@ class Trainer:
         # Distributed Training
         dist_timeout: float = 300.0,
         ddp_sync_strategy: Optional[Union[str, DDPSyncStrategy]] = None,
+        ddp_static_graph: bool = False,
 
         # Profiling
         profiler: Optional[Profiler] = None,
@@ -1517,7 +1520,7 @@ class Trainer:
 
         # DDP wrap if required
         if not self.state.deepspeed_enabled and not self.state.fsdp_enabled and dist.get_world_size() > 1:
-            self.state.model = prepare_ddp_module(self.state.model, self._find_unused_parameters)
+            self.state.model = prepare_ddp_module(self.state.model, self._find_unused_parameters, ddp_static_graph)
 
         # The model would need to be torch.compile()'d after being wrapped in a distributed strategy
         # to take advantage of any graph breaks.
