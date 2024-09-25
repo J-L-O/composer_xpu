@@ -105,7 +105,7 @@ def ddp_sync_context(state: State, is_final_microbatch: bool, sync_strategy: Uni
         raise ValueError('Unknown sync strategy', sync_strategy)
 
 
-def prepare_ddp_module(module: torch.nn.Module, find_unused_parameters: bool, static_graph: bool) -> torch.nn.Module:
+def prepare_ddp_module(module: torch.nn.Module, find_unused_parameters: bool) -> torch.nn.Module:
     """Wraps the module in a :class:`torch.nn.parallel.DistributedDataParallel` object if running distributed training.
 
     Args:
@@ -117,7 +117,7 @@ def prepare_ddp_module(module: torch.nn.Module, find_unused_parameters: bool, st
     if dist.is_available() and dist.is_initialized():
         if any((p.requires_grad for p in module.parameters())):
             log.debug('Wrapping model with DistributedDataParallel')
-            ddp_model = DistributedDataParallel(module, find_unused_parameters=find_unused_parameters, static_graph=static_graph)
+            ddp_model = DistributedDataParallel(module, find_unused_parameters=find_unused_parameters)
             return ddp_model
         return module
     if dist.is_available():
