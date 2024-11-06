@@ -558,6 +558,7 @@ class MultiStepWithWarmupScheduler(ComposerScheduler):
         t_warmup (str | Time): Warmup time.
         milestones (List[str | Time]): Times at which the learning rate should change.
         gamma (float): Multiplicative decay factor. Default = ``0.1``.
+        warmup_i (float): Initial learning rate multiplier for the warmup period. Default = ``0.0``.
         scale_warmup (float): SSR also scales the warmup period. Default = ``False``.
     """
 
@@ -565,12 +566,13 @@ class MultiStepWithWarmupScheduler(ComposerScheduler):
                  t_warmup: Union[str, Time],
                  milestones: List[Union[str, Time]],
                  gamma: float = 0.1,
+                 warmup_i: float = 0.0,
                  scale_warmup: bool = False):
         self.t_warmup = t_warmup
         self.milestones = milestones
         self.gamma = gamma
         self.scale_warmup = scale_warmup
-        self.warmup_scheduler = LinearScheduler(alpha_i=0.0, alpha_f=1.0, t_max=t_warmup)
+        self.warmup_scheduler = LinearScheduler(alpha_i=warmup_i, alpha_f=1.0, t_max=t_warmup)
         self.step_scheduler = MultiStepScheduler(milestones=milestones, gamma=gamma)
 
     def __call__(self, state: State, ssr: float = 1.0):
@@ -619,6 +621,7 @@ class ConstantWithWarmupScheduler(ComposerScheduler):
         t_warmup (str | Time): Warmup time.
         alpha (float): Learning rate multiplier to maintain while this scheduler is active. Default = ``1.0``.
         t_max (str | Time): Duration of this scheduler. Default = ``"1dur"``.
+        warmup_i (float): Initial learning rate multiplier for the warmup period. Default = ``0.0``.
         scale_warmup (float): SSR also scales the warmup period. Default = ``False``.
     """
 
@@ -626,6 +629,7 @@ class ConstantWithWarmupScheduler(ComposerScheduler):
                  t_warmup: Union[str, Time],
                  alpha: float = 1.0,
                  t_max: Union[str, Time] = '1dur',
+                 warmup_i: float = 0.0,
                  scale_warmup: bool = False) -> None:
         self.t_warmup = t_warmup
         self.alpha = alpha
@@ -635,6 +639,7 @@ class ConstantWithWarmupScheduler(ComposerScheduler):
                                                    alpha_i=alpha,
                                                    alpha_f=alpha,
                                                    t_max=t_max,
+                                                   warmup_i=warmup_i,
                                                    scale_warmup=scale_warmup)
 
     def __call__(self, state: State, ssr: float = 1.0) -> float:
@@ -751,6 +756,7 @@ class CosineAnnealingWithWarmupScheduler(ComposerScheduler):
         t_warmup (str | Time): Warmup time.
         t_max (str | Time): The duration of this scheduler. Default = ``"1dur"``.
         alpha_f (float): Learning rate multiplier to decay to. Default = ``0.0``.
+        warmup_i (float): Initial learning rate multiplier for the warmup period. Default = ``0.0``.
         scale_warmup (float): SSR also scales the warmup period. Default = ``False``.
     """
 
@@ -758,12 +764,13 @@ class CosineAnnealingWithWarmupScheduler(ComposerScheduler):
                  t_warmup: Union[str, Time],
                  t_max: Union[str, Time] = '1dur',
                  alpha_f: float = 0.0,
+                 warmup_i: float = 0.0,
                  scale_warmup: bool = False):
         self.t_warmup = t_warmup
         self.t_max = t_max
         self.alpha_f = alpha_f
         self.scale_warmup = scale_warmup
-        self.warmup_scheduler = LinearScheduler(alpha_i=0.0, alpha_f=1.0, t_max=t_warmup)
+        self.warmup_scheduler = LinearScheduler(alpha_i=warmup_i, alpha_f=1.0, t_max=t_warmup)
 
     def __call__(self, state: State, ssr: float = 1.0):
         assert state.max_duration is not None, 'max_duration should be set whenever schedulers are invoked'
@@ -821,6 +828,7 @@ class PolynomialWithWarmupScheduler(ComposerScheduler):
         power (float): The exponent to be used for the proportionality relationship. Default = ``2.0``.
         t_max (str | Time): The duration of this scheduler. Default = ``"1dur"``.
         alpha_f (float): Learning rate multiplier to decay to. Default = ``0.0``.
+        warmup_i (float): Initial learning rate multiplier for the warmup period. Default = ``0.0``.
         scale_warmup (float): SSR also scales the warmup period. Default = ``False``.
     """
 
@@ -829,13 +837,14 @@ class PolynomialWithWarmupScheduler(ComposerScheduler):
                  power: float = 2.0,
                  t_max: Union[str, Time] = '1dur',
                  alpha_f: float = 0.0,
+                 warmup_i: float = 0.0,
                  scale_warmup: bool = False):
         self.t_warmup = t_warmup
         self.power = power
         self.t_max = t_max
         self.alpha_f = alpha_f
         self.scale_warmup = scale_warmup
-        self.warmup_scheduler = LinearScheduler(alpha_i=0.0, alpha_f=1.0, t_max=t_warmup)
+        self.warmup_scheduler = LinearScheduler(alpha_i=warmup_i, alpha_f=1.0, t_max=t_warmup)
 
     def __call__(self, state: State, ssr: float = 1.0):
         assert state.max_duration is not None, 'max_duration should be set whenever schedulers are invoked'
